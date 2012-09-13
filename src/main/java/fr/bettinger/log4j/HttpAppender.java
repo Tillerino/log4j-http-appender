@@ -95,8 +95,11 @@ public class HttpAppender extends AppenderSkeleton {
 		
 		HttpMethodBase httpMethod = null;
 		HttpClient httpClient = new HttpClient();
-		httpClient.setConnectionTimeout(timeOut);
-		httpClient.setTimeout(timeOut);		
+		/*
+		 * On positionne le timeout
+		 */
+		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(timeOut);
+		httpClient.getParams().setSoTimeout(timeOut);		
 
 		String message = this.getLayout().format(paramLoggingEvent);
 		if (this.HttpMethodBase.equalsIgnoreCase(METHOD_GET)) {

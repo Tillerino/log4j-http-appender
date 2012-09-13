@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Layout;
+import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
 
 /**
@@ -35,40 +36,61 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public class HttpLayout extends Layout {
 
+	/**
+	 * Attribut positionné lorsque les messages ne sont pas de type
+	 * HttpMessage<br/>
+	 * Thanks to Kjetil Thuen
+	 */
+	private final static String UNHANDLEDMESSAGE = "UnhandledMessage";
+
+	/**
+	 * String value for null string
+	 */
+	private final static String NULL = "null";
+
 	public String conversionPattern = "";
 	public void setConversionPattern(String conversionPattern) {
 		this.conversionPattern = conversionPattern;
 	}
-	
+
 	public String encoding = "UTF-8";
 	public void setEncoding(String encoding) {
 		this.encoding = encoding.trim();
+	}
+
+	public boolean urlEncode = true;
+	public void setUrlEncode(boolean urlEncode) {
+		this.urlEncode = urlEncode;
 	}
 
 	public void activateOptions() { }
 
 	@Override
 	public String format(LoggingEvent paramLoggingEvent) {
+		String returnMessage = new String(conversionPattern);
+		String value= null;
 		if (paramLoggingEvent.getMessage() instanceof HttpMessage) {
-			String returnMessage = new String(conversionPattern);
 			HttpMessage message = (HttpMessage)paramLoggingEvent.getMessage();
-
 			Map<String, String> map = message.getParametersMap();
 			String key = null;
-			String value= null;
+
 			for (Iterator<String> i = map.keySet().iterator() ; i.hasNext() ; ){
-			    key = i.next();
-			    value = map.get(key);
-			    try {
-			    	value = URLEncoder.encode(value, encoding);
-			    } catch (UnsupportedEncodingException e) {}
-			    if (value != null) {
-			    	returnMessage = returnMessage.replaceAll("%"+key,value);
-			    }
+				key = i.next();
+				value = map.get(key);
+				returnMessage = formatMessage(returnMessage, key, value);
+
+				
 			}
-			return returnMessage;
-		} else 
-			return paramLoggingEvent.getMessage().toString();
+		} else {
+			if (paramLoggingEvent.getMessage() == null) {
+				value = null;
+			} else {
+				value = paramLoggingEvent.getMessage().toString();
+			}
+			returnMessage = formatMessage(returnMessage, UNHANDLEDMESSAGE, value);
+
+		}
+		return returnMessage.toString();
 	}
 
 	@Override
@@ -76,4 +98,21 @@ public class HttpLayout extends Layout {
 		return true;
 	}
 
+	private String formatMessage(String returnMessage, String key, String value) {
+		if (value == null) {
+			LogLog.warn("Setting NULL value for " + key);
+			value = NULL;
+		} 
+
+		if (urlEncode) {
+			try {
+				value = URLEncoder.encode(value, encoding);
+			} catch (UnsupportedEncodingException e) {
+				LogLog.warn(e.toString());
+
+			}
+		}
+		returnMessage = returnMessage.replaceAll("%"+key,value);
+		return returnMessage;
+	}
 }
