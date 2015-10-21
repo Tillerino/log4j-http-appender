@@ -2,11 +2,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.tillerino</groupId>
 	<artifactId>log4j-http-appender</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<description>http appender for log4j</description>
 	<scm>
 		<developerConnection>scm:git:git@github.com:Tillerino/log4j-http-appender.git</developerConnection>
-	  <tag>v0.0.2</tag>
+	  <tag>HEAD</tag>
   </scm>
 	<build>
 		<plugins>
