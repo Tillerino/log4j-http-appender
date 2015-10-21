@@ -1,10 +1,24 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>log4j</groupId>
-	<artifactId>httpAppender</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>com.github.tillerino</groupId>
+	<artifactId>log4j-http-appender</artifactId>
+	<version>0.0.2-SNAPSHOT</version>
 	<description>http appender for log4j</description>
+	<scm>
+		<developerConnection>scm:git:git@github.com:Tillerino/log4j-http-appender.git</developerConnection>
+	</scm>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
+				<configuration>
+					<tagNameFormat>v@{project.version}</tagNameFormat>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<dependencies>
 		<dependency>
 			<groupId>commons-httpclient</groupId>
