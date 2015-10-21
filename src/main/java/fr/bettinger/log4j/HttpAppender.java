@@ -20,12 +20,19 @@
 
 package fr.bettinger.log4j;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Logger;
+import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
+
+import fr.bettinger.log4j.HttpLayout.URLParameterNameLayout;
 
 /**
  * HttpAppender is used to send an httpEvent to a server
@@ -35,6 +42,7 @@ import org.apache.log4j.spi.LoggingEvent;
  *
  */
 public class HttpAppender extends AppenderSkeleton {
+	final Logger log = Logger.getLogger(HttpAppender.class);
 
 	/**
 	 * Valeur par défaut du Timeout de la connexion http
@@ -76,8 +84,12 @@ public class HttpAppender extends AppenderSkeleton {
 	private String postMethod = POST_DEFAULT;
 	
 	private boolean thread = THREAD_DEFAULT;
+	
+	private ExecutorService executorService = Executors.newCachedThreadPool();
 
-	public void close() {}
+	public void close() {
+		executorService.shutdown();
+	}
 
 	public boolean requiresLayout() {
 		return true;
@@ -92,6 +104,7 @@ public class HttpAppender extends AppenderSkeleton {
 			errorHandler.error("you must use a HttpLayout type");
 			return;
 		}
+		HttpLayout layout = (HttpLayout) getLayout();
 		
 		HttpMethodBase httpMethod = null;
 		HttpClient httpClient = new HttpClient();
@@ -101,20 +114,23 @@ public class HttpAppender extends AppenderSkeleton {
 		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(timeOut);
 		httpClient.getParams().setSoTimeout(timeOut);		
 
-		String message = this.getLayout().format(paramLoggingEvent);
 		if (this.HttpMethodBase.equalsIgnoreCase(METHOD_GET)) {
-			StringBuffer sb = new StringBuffer(this.logURL);
-			sb.append(message);
-			httpMethod = new GetMethod(sb.toString());
+			String query = layout.format(paramLoggingEvent);
+			String url = this.logURL + query;
+			LogLog.debug(url);
+			httpMethod = new GetMethod(url);
 		} else {
 			if (this.postMethod.equalsIgnoreCase(POST_PARAMETERS)) {
 				httpMethod = new PostMethod(this.logURL);
-				message = message.substring(1);
-				for (String attributes : message.split("&")) {
-					String[] attribute = attributes.split("=");
-					((PostMethod)httpMethod).addParameter(attribute[0], attribute[1]);
+				// post requests don't need to be encoded manually
+				layout.urlEncode = false;
+				for (int i = 0; i < layout.subLayouts.size(); i+=2) {
+					URLParameterNameLayout nameLayout = (URLParameterNameLayout) layout.subLayouts.get(i);
+					String value = layout.subLayouts.get(i + 1).format(paramLoggingEvent);
+					((PostMethod) httpMethod).addParameter(nameLayout.getValue(), value);
 				}
 			} else {
+				String message = layout.format(paramLoggingEvent);
 				StringBuffer sb = new StringBuffer(this.logURL);
 				sb.append(message);
 				httpMethod = new PostMethod(sb.toString());
@@ -124,8 +140,7 @@ public class HttpAppender extends AppenderSkeleton {
 		httpThread.setMethod(httpMethod);
 
 		if (thread) {
-			Thread t = new Thread(httpThread);
-			t.start();
+			executorService.submit(httpThread);
 		} else {
 			httpThread.run();
 		}

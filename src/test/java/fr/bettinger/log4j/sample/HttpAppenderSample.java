@@ -21,8 +21,7 @@
 package fr.bettinger.log4j.sample;
 
 import org.apache.log4j.Logger;
-
-import fr.bettinger.log4j.HttpMessage;
+import org.apache.log4j.MDC;
 
 
 /**
@@ -34,7 +33,6 @@ public class HttpAppenderSample {
 
 	static final String id = "id";
 	static final String uid = "uid";
-	static final String evt = "evt";
 	
 	/**
 	 * Logger log4j
@@ -46,15 +44,11 @@ public class HttpAppenderSample {
 	 * 
 	 */
 	public static void main(String[] args) {
-		
-		//Create a new message
-		HttpMessage message = new HttpMessage ();
-		message.addParameter(id, "1");
-		message.addParameter(uid, "sebastien");
-		message.addParameter(evt, "just a test");
+		MDC.put(id, "1");
+		MDC.put(uid, "sebastien");
 		
 		//send message via httpAppender
-		log.debug(message);
+		log.debug("just a test");
 		
 	}
 
