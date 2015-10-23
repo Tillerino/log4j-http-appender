@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.tillerino</groupId>
 	<artifactId>log4j-http-appender</artifactId>
-	<version>0.2-SNAPSHOT</version>
+	<version>0.2</version>
 	<packaging>jar</packaging>
 	<name>log4j-http-appender</name>
 	<description>http appender for log4j</description>
@@ -25,7 +24,7 @@
 		<developerConnection>scm:git:git@github.com:Tillerino/log4j-http-appender.git</developerConnection>
 		<connection>scm:git:git@github.com:Tillerino/log4j-http-appender.git</connection>
 		<url>git@github.com:Tillerino/log4j-http-appender.git</url>
-		<tag>HEAD</tag>
+		<tag>v0.2</tag>
 	</scm>
 	<distributionManagement>
 		<snapshotRepository>
