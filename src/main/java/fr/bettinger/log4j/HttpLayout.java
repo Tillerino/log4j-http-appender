@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.EnhancedPatternLayout;
 import org.apache.log4j.Layout;
-import org.apache.log4j.PatternLayout;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
 
@@ -40,7 +40,7 @@ import org.apache.log4j.spi.LoggingEvent;
  *
  */
 public class HttpLayout extends Layout {
-	private final class URLEncodingPatternLayout extends PatternLayout {
+	private final class URLEncodingPatternLayout extends EnhancedPatternLayout {
 		private URLEncodingPatternLayout(String pattern) {
 			super(pattern);
 		}
@@ -95,6 +95,14 @@ public class HttpLayout extends Layout {
 	public static final Pattern URL_PARAMETER_PATTERN = Pattern.compile("(\\?|&)(\\w+)=");
 	
 	List<Layout> subLayouts = new ArrayList<Layout>();
+	
+	public HttpLayout() {
+		
+	}
+	
+	public HttpLayout(String pattern) throws MalformedURLException {
+		setConversionPattern(pattern);
+	}
 	
 	public void setConversionPattern(String conversionPattern) throws MalformedURLException {
 		Matcher m = URL_PARAMETER_PATTERN.matcher(conversionPattern);
